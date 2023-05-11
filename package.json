@@ -1,0 +1,28 @@
+{
+  "name": "twitter-extras",
+  "version": "1.0.0",
+  "description": "Adds a bit of flavor to Twitter by enabling various additional features and abilities.",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc && npm run copyManifest && npm run makeIconDir && npm run copyIcons",
+    "makeIconDir": "if not exist .\\dist\\icons (mkdir .\\dist\\icons)",
+    "copyIcons": "copy .\\src\\icons\\* .\\dist\\icons",
+    "copyManifest": "copy .\\src\\manifest.json .\\dist\\"
+  },  
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonathansampson/twitter-extras.git"
+  },
+  "keywords": [
+    "Twitter"
+  ],
+  "author": "Sampson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jonathansampson/twitter-extras/issues"
+  },
+  "homepage": "https://github.com/jonathansampson/twitter-extras#readme",
+  "devDependencies": {
+    "@types/chrome": "^0.0.235"
+  }
+}

@@ -1,2 +1,2 @@
-# twitter-extras
-Enables extra features on Twitter (e.g. picture-in-picture)
+# Twitter Extras
+Enables extra features on Twitter (e.g. savings videos, and picture-in-picture).
