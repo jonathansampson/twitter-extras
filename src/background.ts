@@ -1,7 +1,5 @@
 chrome.runtime.onInstalled.addListener(() => {
 
-    console.log("Registering content scripts");
-
     const scripts = [
         {
             id: "mediator",
@@ -12,6 +10,11 @@ chrome.runtime.onInstalled.addListener(() => {
             id: "mainWorld",
             world: "MAIN",
             js: ["content.js"],
+            matches: ["https://twitter.com/*"],
+        },
+        {
+            id: "feature-ultraWide",
+            js: ["feature-ultraWide.js"],
             matches: ["https://twitter.com/*"],
         }
     ] as chrome.scripting.RegisteredContentScript[];
