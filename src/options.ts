@@ -1,14 +1,19 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const checkbox = document.querySelector('[data-feature="ultrawide"]');
+  // Set initial state of feature boxes, as well
+  // as bind their change handlers
+  const features = document.querySelectorAll("[data-feature]");
 
-  if (checkbox instanceof HTMLInputElement) {
-    chrome.storage.local.get("ultrawide", function (data) {
-      checkbox.checked = data.ultrawide;
-    });
-
-    checkbox.addEventListener("change", (event) => {
-      const target = event.target as HTMLInputElement;
-      chrome.storage.local.set({ ultrawide: target.checked });
-    });
+  for (const feature of features) {
+    if (feature instanceof HTMLInputElement) {
+      const featureName = feature.dataset.feature!;
+      // Sets initial state from storage
+      chrome.storage.local.get(featureName, (data) => {
+        feature.checked = data[featureName];
+      });
+      // Binds change handler for element
+      feature.addEventListener("change", (event) => {
+        chrome.storage.local.set({ [featureName]: feature.checked });
+      });
+    }
   }
 });

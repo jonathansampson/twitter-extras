@@ -13,8 +13,8 @@ chrome.runtime.onInstalled.addListener(() => {
             matches: ["https://twitter.com/*"],
         },
         {
-            id: "feature-ultraWide",
-            js: ["feature-ultraWide.js"],
+            id: "features",
+            js: ["features.js"],
             matches: ["https://twitter.com/*"],
         }
     ] as chrome.scripting.RegisteredContentScript[];
