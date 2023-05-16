@@ -42,7 +42,9 @@ function getVideoProps(container: HTMLElement): any {
   return null;
 }
 
-function getReactProps(element: HTMLElement & { [key: string]: any }): any | null {
+function getReactProps(
+  element: HTMLElement & { [key: string]: any }
+): any | null {
   for (const property of Object.getOwnPropertyNames(element)) {
     if (property.startsWith("__reactProps")) {
       return element[property];
@@ -54,7 +56,9 @@ function getReactProps(element: HTMLElement & { [key: string]: any }): any | nul
 document.addEventListener("contextmenu", (event) => {
   event.stopPropagation();
   if (event.target instanceof HTMLElement) {
-    const videoComponent = event.target.closest("[data-testid='videoComponent']");
+    const videoComponent = event.target.closest(
+      "[data-testid='videoComponent']"
+    );
     if (videoComponent instanceof HTMLElement) {
       addMenuItems(videoComponent);
     }
@@ -69,34 +73,45 @@ function addMenuItems(videoComponent: HTMLElement): void {
     const container = baseMenuItem.parentElement!;
 
     // Add our Download button
-    const downloadMenuItem = createMenuItem({
-      template,
-      label: "Download Media",
-      identifier: "twitter-extras-download",
-      handler: () => {
-        downloadVideo(videoComponent.closest("[data-testid='tweetPhoto']")!)
-      }
-    });
+    if (container.querySelector("#twitter-extras-download") === null) {
+      const downloadMenuItem = createMenuItem({
+        template,
+        label: "Download Media",
+        identifier: "twitter-extras-download",
+        handler: () => {
+          downloadVideo(videoComponent.closest("[data-testid='tweetPhoto']")!);
+        },
+      });
+
+      container.appendChild(downloadMenuItem);
+    }
 
     // Add our Picture-in-Picture button
-    const pipMenuItem = createMenuItem({
-      template,
-      label: "Picture-in-Picture",
-      identifier: "twitter-extras-pip",
-      handler: () => {
-        const video = videoComponent.querySelector("video");
-        if (video) {
-          video.removeAttribute("disablepictureinpicture");
-          video.requestPictureInPicture();
-        }
-      }
-    });
+    if (container.querySelector("#twitter-extras-pip") === null) {
+      const pipMenuItem = createMenuItem({
+        template,
+        label: "Picture-in-Picture",
+        identifier: "twitter-extras-pip",
+        handler: () => {
+          const video = videoComponent.querySelector("video");
+          if (video) {
+            video.removeAttribute("disablepictureinpicture");
+            video.requestPictureInPicture();
+          }
+        },
+      });
 
-    container.append(downloadMenuItem, pipMenuItem);
+      container.appendChild(pipMenuItem);
+    }
   }
 }
 
-function createMenuItem({ template, identifier, label, handler }: any): HTMLElement {
+function createMenuItem({
+  template,
+  identifier,
+  label,
+  handler,
+}: any): HTMLElement {
   const button = template.cloneNode(true) as HTMLElement;
   const span = button.querySelector("span")!;
 

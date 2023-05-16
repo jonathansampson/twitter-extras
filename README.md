@@ -1,5 +1,9 @@
 # Twitter Extras
 
+### Version 2.1
+
+Fixed issue where multiple download/pip buttons would be displayed.
+
 ## Version 2.0
 
 Adds support for ultra-wide Twitter. This option removes the sidebar column, which typically contains the *What's Happening* and *Who to Follow* sections. The resulting space is filled by the primary column, creating a considerably wider timeline.
