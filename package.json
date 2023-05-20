@@ -1,6 +1,6 @@
 {
   "name": "twitter-extras",
-  "version": "2.2.0",
+  "version": "3.0.0",
   "description": "Adds a bit of flavor to Twitter by enabling various additional features and abilities.",
   "main": "index.js",
   "scripts": {
