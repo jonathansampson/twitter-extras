@@ -4,6 +4,10 @@
 
 Adds support for inline code wrapping. This option will replace portions of Tweets wrapped in a single set of backticks (i.e. the ` character) with code tags. Further, the resulting text will be more easily distinguishable from surrounding text in size, font, and color.
 
+### Version 3.1
+
+Adds support for downloading voice tweets. Click the … at the top-right of a voice Tweet, and select "Download Voice Tweet" from the menu.
+
 ## Version 2.0
 
 Adds support for ultra-wide Twitter. This option removes the sidebar column, which typically contains the *What's Happening* and *Who to Follow* sections. The resulting space is filled by the primary column, creating a considerably wider timeline.

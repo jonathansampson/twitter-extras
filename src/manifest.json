@@ -1,11 +1,11 @@
 {
     "manifest_version": 3,
     "name": "Twitter Extras",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "icons": {
         "64": "icons/icon64.png"
     },
-    "description": "Adds some extra features to Twitter, including video download and picture-in-picture.",
+    "description": "Adds some extra features to Twitter, including video download, picture-in-picture, and more.",
     "permissions": ["downloads", "scripting", "storage"],
     "background": {
         "service_worker": "background.js"
