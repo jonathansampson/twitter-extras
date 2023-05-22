@@ -8,8 +8,9 @@
     "copyManifest": "copy .\\src\\manifest.json .\\dist\\",
     "copyOptions": "copy .\\src\\options.html .\\dist\\",
     "copyIcons": "copy .\\src\\icons\\* .\\dist\\icons",
-    "postbuild": "npm run copyManifest && npm run copyOptions && npm run copyIcons"
-  },  
+    "makeIconDir": "if not exist .\\dist\\icons (mkdir .\\dist\\icons)",
+    "postbuild": "npm run copyManifest && npm run makeIconDir && npm run copyIcons && npm run copyOptions"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jonathansampson/twitter-extras.git"
