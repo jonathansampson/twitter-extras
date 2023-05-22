@@ -4,11 +4,11 @@
   "description": "Adds a bit of flavor to Twitter by enabling various additional features and abilities.",
   "main": "index.js",
   "scripts": {
-    "build": "tsc && npm run copyManifest && npm run makeIconDir && npm run copyIcons && npm run copyOptions",
-    "makeIconDir": "if not exist .\\dist\\icons (mkdir .\\dist\\icons)",
-    "copyIcons": "copy .\\src\\icons\\* .\\dist\\icons",
+    "build": "webpack",
     "copyManifest": "copy .\\src\\manifest.json .\\dist\\",
-    "copyOptions": "copy .\\src\\options.html .\\dist\\"
+    "copyOptions": "copy .\\src\\options.html .\\dist\\",
+    "copyIcons": "copy .\\src\\icons\\* .\\dist\\icons",
+    "postbuild": "npm run copyManifest && npm run copyOptions && npm run copyIcons"
   },  
   "repository": {
     "type": "git",
@@ -24,6 +24,10 @@
   },
   "homepage": "https://github.com/jonathansampson/twitter-extras#readme",
   "devDependencies": {
-    "@types/chrome": "^0.0.235"
+    "@types/chrome": "^0.0.235",
+    "ts-loader": "^9.4.2",
+    "typescript": "^5.0.4",
+    "webpack": "^5.83.1",
+    "webpack-cli": "^5.1.1"
   }
 }

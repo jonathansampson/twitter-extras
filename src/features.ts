@@ -1,175 +1,20 @@
-interface Feature {
-  id: string;
-  enabled: boolean;
-  data?: any;
-  enable: () => void;
-  disable: () => void;
-}
+import { Feature, StorageChanges, StorageRecords } from "./types";
 
-interface StorageChanges {
-  [key: string]: chrome.storage.StorageChange;
-}
+import downloadVoiceTweets from "./features/downloadVoiceTweets";
+import hideWhatsHappening from "./features/hideWhatsHappening";
+import hideWhoToFollow from "./features/hideWhoToFollow";
+import formatCodeBlocks from "./features/formatCodeBlocks";
 
-interface StorageRecords {
-  [key: string]: any;
-}
+const defaultFeatures = [
+  /* Downloadable Videos */, /* https://twitter.com/HumansNoContext/status/1660339245607780359 */
+  /* Picture-in-Picture */, /* https://twitter.com/HumansNoContext/status/1660339245607780359 */
+];
 
-const hideWhatsHappening: Feature = {
-  id: "hideWhatsHappening",
-  enable: () => {
-    if (hideWhatsHappening.enabled) {
-      return;
-    }
-
-    const element = document.createElement("style");
-    element.id = `feature-${hideWhatsHappening.id}`;
-    element.textContent = `
-            [data-testid="sidebarColumn"] div:has(> div > section [data-testid="trend"]) {
-                display: none;
-            }
-        `;
-
-    document.head.appendChild(element);
-  },
-  disable: () => {
-    if (!hideWhatsHappening.enabled) {
-      return;
-    }
-    document.getElementById(`feature-${hideWhatsHappening.id}`)?.remove();
-  },
-  get enabled() {
-    return document.getElementById(`feature-${hideWhatsHappening.id}`) !== null;
-  },
-};
-
-const hideWhoToFollow: Feature = {
-  id: "hideWhoToFollow",
-  enable: () => {
-    if (hideWhoToFollow.enabled) {
-      return;
-    }
-
-    const element = document.createElement("style");
-    element.id = `feature-${hideWhoToFollow.id}`;
-    element.textContent = `
-            [data-testid="sidebarColumn"] div:has(> div > aside a[href*="/i/connect_people"]) {
-                display: none;
-            }
-        `;
-
-    document.head.appendChild(element);
-  },
-  disable: () => {
-    if (!hideWhoToFollow.enabled) {
-      return;
-    }
-    document.getElementById(`feature-${hideWhoToFollow.id}`)?.remove();
-  },
-  get enabled() {
-    return document.getElementById(`feature-${hideWhoToFollow.id}`) !== null;
-  },
-};
-
-const formatCodeBlocks: Feature = {
-  id: "formatCodeBlocks",
-  enabled: false,
-  data: {
-    codeBlockRegEx: /(?<!`)(`[^`]*`)(?!`)/g,
-    observer: null as null | MutationObserver,
-  },
-  enable: () => {
-    if (formatCodeBlocks.enabled) {
-      return;
-    }
-
-    formatCodeBlocks.enabled = true;
-
-    const processInlineCode = (box: HTMLElement) => {
-      // Create a text walker to access every text node
-      const nodes: Text[] = [];
-      const walker = document.createTreeWalker(box, NodeFilter.SHOW_TEXT);
-
-      // Collect the nodes
-      while (walker.nextNode()) {
-        nodes.push(walker.currentNode as Text);
-      }
-
-      // Examine each of the nodes
-      for (const node of nodes) {
-        const text = node.textContent as string;
-        const parts = text.split(formatCodeBlocks.data.codeBlockRegEx);
-
-        // Process nodes with code blocks
-        if (parts.length > 1) {
-          const fragment = document.createDocumentFragment();
-          for (const part of parts) {
-            if (part.startsWith("`") && part.endsWith("`")) {
-              const code = document.createElement("code");
-
-              code.style.padding = "0.15em";
-              code.style.fontSize = "0.85em";
-              code.style.color = "rgb(255, 127, 80)";
-
-              code.textContent = part.substring(1, part.length - 1);
-              fragment.append(code);
-              continue;
-            }
-            fragment.append(document.createTextNode(part));
-          }
-          node.parentNode?.replaceChild(fragment, node);
-        }
-      }
-    };
-
-    const selector = "[data-testid='tweetText']";
-
-    // Process all existing code blocks
-    for (const tweetText of document.querySelectorAll(selector)) {
-      if (tweetText instanceof HTMLElement) {
-        processInlineCode(tweetText);
-      }
-    }
-
-    // Listen for, and process, new code blocks
-    const observer = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        for (const node of mutation.addedNodes) {
-          if (node instanceof HTMLElement) {
-            const tweetText = node.querySelector(selector);
-            if (tweetText instanceof HTMLElement) {
-              processInlineCode(tweetText);
-            }
-          }
-        }
-      }
-    });
-
-    formatCodeBlocks.data.observer = observer;
-    observer.observe(document.body, { childList: true, subtree: true });
-  },
-  disable: () => {
-    if (!formatCodeBlocks.enabled) {
-      return;
-    }
-
-    // Disable feature and disconnect the observer
-    formatCodeBlocks.enabled = false;
-    formatCodeBlocks.data.mutationObserver?.disconnect();
-    formatCodeBlocks.data.mutationObserver = null;
-
-    // Revert all code blocks to their original state
-    for (const code of document.querySelectorAll("code")) {
-      const text = code.textContent as string;
-      const content = document.createTextNode(`\`${text}\``);
-      code.parentNode?.replaceChild(content, code);
-    }
-  },
-};
-
-const features = {
+const optionalFeatures = {
   hideWhatsHappening,
   hideWhoToFollow,
-  formatCodeBlocks,
+  formatCodeBlocks,     /* https://twitter.com/jonathansampson/status/1659603602636259333 */
+  downloadVoiceTweets,  /* https://twitter.com/ehikian/status/1659670588598923265 */
 } as Record<string, Feature>;
 
 /**
@@ -192,16 +37,16 @@ function setFeatures(items: StorageRecords | StorageChanges) {
    * Cycle over all features, and enable/disable them
    * based on the value in `items`, if any.
    */
-  for (const featureName in features) {
+  for (const featureName in optionalFeatures) {
     if (items.hasOwnProperty(featureName)) {
       const value = items[featureName];
       const newValue = typeof value === "object" ? value.newValue : value;
       if (newValue === true) {
         console.log(`Enabling ${featureName}`);
-        features[featureName].enable();
+        optionalFeatures[featureName].enable();
       } else if (newValue === false) {
         console.log(`Disabling ${featureName}`);
-        features[featureName].disable();
+        optionalFeatures[featureName].disable();
       }
     }
   }

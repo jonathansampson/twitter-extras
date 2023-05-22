@@ -26,13 +26,8 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     if (message.type === "downloadMedia") {
-        const { authorScreenName, tweetId, url } = message.data;
-        const filename = `@${authorScreenName}-${tweetId}.mp4`;
-
-        console.log(`Downloading media from ${authorScreenName}`, url, tweetId);
-
+        const { filename, url } = message.data;
         chrome.downloads.download({ url, filename });
-
         sendResponse({ success: true });
     }
 

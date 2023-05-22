@@ -1,9 +1,37 @@
+import * as utils from "./utils";
+
 console.log("Twitter Extras is running…");
 
 interface VideoVariant {
   bitrate?: number;
   content_type: string;
   url: string;
+}
+
+window.addEventListener("message", (event) => {
+
+  if (event.data.type === "getVoiceInfo") {
+    const tweetID = event.data.data.tweetID;
+    const messageID = event.data.messageID;
+
+    const element = getTweetElementFromDOM(tweetID);
+    const reactProps = utils.getReactProps(element!);
+    const properties = utils.recursivelyFindProperty(reactProps, "tweet");
+
+    if (properties) {
+      utils.mainWorldResponse({ messageID, properties });
+    }
+  }
+
+});
+
+function getTweetElementFromDOM(tweetID: string): HTMLElement | null {
+  const elementSelector = `[data-testid='tweet']:has(a[href*='/status/${tweetID}'])`;
+  const tweetElement = document.querySelector(elementSelector);
+  if (tweetElement instanceof HTMLElement) {
+    return tweetElement;
+  }
+  return null;
 }
 
 function downloadVideo(tweetPhoto: HTMLElement): void {
@@ -22,7 +50,10 @@ function downloadVideo(tweetPhoto: HTMLElement): void {
 
         if (video.url) {
           const type = "downloadMedia";
-          const data = { authorScreenName, tweetId, url: video.url };
+          const data = {
+            filename: `@${authorScreenName}-${tweetId}.mp4`,
+            url: video.url
+          };
           window.postMessage({ type, data }, "*");
         }
       }
@@ -32,7 +63,7 @@ function downloadVideo(tweetPhoto: HTMLElement): void {
 
 function getVideoProps(container: HTMLElement): any {
   console.log("getVideoProps", container);
-  const properties = getReactProps(container);
+  const properties = utils.getReactProps(container);
   if (properties) {
     const childProps = properties?.children?.props;
     if (childProps?.videoType) {
@@ -42,16 +73,7 @@ function getVideoProps(container: HTMLElement): any {
   return null;
 }
 
-function getReactProps(
-  element: HTMLElement & { [key: string]: any }
-): any | null {
-  for (const property of Object.getOwnPropertyNames(element)) {
-    if (property.startsWith("__reactProps")) {
-      return element[property];
-    }
-  }
-  return null;
-}
+
 
 document.addEventListener("contextmenu", (event) => {
   event.stopPropagation();
