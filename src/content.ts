@@ -73,8 +73,6 @@ function getVideoProps(container: HTMLElement): any {
   return null;
 }
 
-
-
 document.addEventListener("contextmenu", (event) => {
   event.stopPropagation();
   if (event.target instanceof HTMLElement) {
