@@ -9,9 +9,13 @@ async function main () {
     try {
         await mkdir('./dist/icons');
     } catch (err) {} finally {
-        const icons = await readdir('./src/icons');
-        for (const icon of icons) {
-            copyFile(`./src/icons/${icon}`, `./dist/icons/${icon}`);
+        try {
+            const icons = await readdir('./src/icons');
+            for (const icon of icons) {
+                copyFile(`./src/icons/${icon}`, `./dist/icons/${icon}`);
+            }
+        } catch (e) {
+            console.error('No icons found. Please add icons to ./src/icons');
         }
     }
 
@@ -19,9 +23,13 @@ async function main () {
     try {
         await mkdir('./dist/images');
     } catch (err) {} finally {
-        const images = await readdir('./src/images');
-        for (const image of images) {
-            copyFile(`./src/images/${image}`, `./dist/images/${image}`);
+        try {
+            const images = await readdir('./src/images');
+            for (const image of images) {
+                copyFile(`./src/images/${image}`, `./dist/images/${image}`);
+            }
+        } catch (e) {
+            console.error('No images found. Please add images to ./src/images');
         }
     }
 }
