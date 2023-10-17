@@ -34,6 +34,8 @@ const enable = () => {
     mutationObserver = observer;
     observer.observe(document.body, { childList: true, subtree: true });
 
+    addTimecodeStyles();
+
     // Delegate click events on timecode links
     document.body.addEventListener("click", (event) => {
         const target = event.target as HTMLAnchorElement;
@@ -58,8 +60,30 @@ const disable = () => {
     mutationObserver?.disconnect();
     mutationObserver = null;
 
+    removeTimecodeStyles();
     revertTimecodeLinks();
 
+};
+
+const addTimecodeStyles = () => {
+    const style = document.createElement("style");
+
+    style.dataset.identifier = identifier;
+
+    style.textContent = `
+      ${timecodeLinkSelector} {
+        cursor: pointer;
+        color: rgb(29, 155, 240);
+        text-decoration: none;
+      }
+    `;
+
+    document.head.appendChild(style);
+};
+
+const removeTimecodeStyles = () => {
+    const style = document.querySelector(`style[data-identifier='${identifier}']`);
+    style?.remove();
 };
 
 const processMediaElements = (root: HTMLElement = document.body) => {
@@ -119,7 +143,6 @@ function createTimestampLink(timestamp: string): HTMLAnchorElement {
     element.href = "#";
     element.textContent = timestamp;
     element.dataset.timecode = timestamp;
-    element.className = getLinkClassList();
     return element;
 }
 
@@ -147,16 +170,6 @@ function revertTimecodeLinks() {
             parent.replaceChild(textNode, timecodeLink);
         }
     }
-}
-
-function getLinkClassList() {
-    /**
-     * We'll match the styling of the ToS link
-     * in the footer, for now.
-     */
-    const tosLink = document.querySelector("a[href$='/tos']");
-
-    return tosLink?.className ?? "";
 }
 
 const feature: Feature = {
