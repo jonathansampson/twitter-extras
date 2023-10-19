@@ -8,7 +8,14 @@ let enabled = false;
 let mutationObserver: MutationObserver | null = null;
 const timecodeLinkSelector = "a[data-timecode]";
 const tweetTextSelector = "[data-testid='tweetText']";
-const mediaSelector = "[data-testid='videoComponent'] video";
+const mediaSelector = `[data-testid='tweet'] [data-testid='videoComponent'] video`;
+
+/**
+ * Test URLs:
+ * - https://twitter.com/theallinpod/status/1712871157685199032
+ * - https://twitter.com/TuckerCarlson (any Tweet with follow-up timecodes)
+ * - https://twitter.com/TuckerCarlson/status/1714827415241867538
+ */
 
 const enable = () => {
     if (enabled) {
@@ -40,9 +47,8 @@ const enable = () => {
     document.body.addEventListener("click", (event) => {
         const target = event.target as HTMLAnchorElement;
         if (target.matches(timecodeLinkSelector)) {
-            const tweet = target.closest("[data-testid='tweet']");
-            const media = tweet?.querySelector(mediaSelector) as HTMLMediaElement;
-            if (media) {
+            const media = document.querySelector(`[src='${target.dataset.videoSrc}']`);
+            if (media instanceof HTMLMediaElement) {
                 event.preventDefault();
                 handleTimestampClick(target, media);
             }
@@ -86,14 +92,49 @@ const removeTimecodeStyles = () => {
     style?.remove();
 };
 
-const processMediaElements = (root: HTMLElement = document.body) => {
+const processMediaElements = async (root: HTMLElement = document.body) => {
     const mediaElements = root.querySelectorAll(mediaSelector);
     for (const media of mediaElements) {
-        const tweet = media.closest("[data-testid='tweet']");
-        const content = tweet?.querySelector(tweetTextSelector);
-        const timestamps = getTimestamps(content?.textContent || "");
-        if (media instanceof HTMLMediaElement && timestamps.length >= 2) {
-            waitForMediaReady(media, timestamps);
+        if (media instanceof HTMLMediaElement) {
+            await mediaReady(media);
+
+            /**
+             * Locate timecode-tweet. It could be the same Tweet as the
+             * media itself, or it could be in a follow-up Tweet (as is
+             * the case with @TuckerCarlson often times).
+             */
+            const mediaTweet = media.closest("[data-testid='tweet']");
+            const mediaTweetText = mediaTweet?.querySelector(tweetTextSelector);
+            const mediaTimestamps = getTimestamps(mediaTweetText?.textContent || "");
+
+            if (mediaTweet instanceof HTMLElement && mediaTimestamps.length >= 2) {
+                activateMediaTimeStamps(media, mediaTweet, mediaTimestamps);
+                return;
+            }
+
+            /**
+             * If we don't find timecodes in the media Tweet, we'll look
+             * in the next Tweet in the thread. If the next element doesn't
+             * exist, or doesn't have a Tweet format, then we'll proceed to
+             * the next media element. We will only check, at most, the next
+             * two elements after the main media-containing Tweet.
+             */
+            let depth = 0;
+            let mediaContainer = media.closest("[data-testid='cellInnerDiv']")?.nextElementSibling;
+
+            while (depth < 2 && mediaContainer && !mediaContainer?.querySelector("[data-testid='tweet']")) {
+                depth += 1;
+                mediaContainer = mediaContainer?.nextElementSibling;
+            }
+
+            const nextTweet = mediaContainer?.querySelector("[data-testid='tweet']");
+            const nextTweetText = nextTweet?.querySelector(tweetTextSelector);
+            const nextTweetTimestamps = getTimestamps(nextTweetText?.textContent || "");
+
+            if (nextTweet instanceof HTMLElement && nextTweetTimestamps.length >= 2) {
+                activateMediaTimeStamps(media, nextTweet, nextTweetTimestamps);
+                return;
+            }
         }
     }
 };
@@ -108,10 +149,9 @@ function getTimestamps(text: string): string[] {
     return text.match(regex) || [];
 }
 
-function makeTimecodesClickable(media: HTMLMediaElement, timestamps: string[]) {
+function activateMediaTimeStamps(media: HTMLMediaElement, tweet: HTMLElement, timestamps: string[]) {
 
-    const tweet = media.closest("[data-testid='tweet']");
-    const tweetText = tweet?.querySelector("[data-testid='tweetText']");
+    const tweetText = tweet.querySelector(tweetTextSelector);
 
     if (!tweetText || !tweetText.textContent) {
         return;
@@ -121,21 +161,26 @@ function makeTimecodesClickable(media: HTMLMediaElement, timestamps: string[]) {
         if (timestampToSeconds(timestamp) > media.duration) {
             continue;
         }
+
         const timecodeLink = createTimestampLink(timestamp);
-        const regex = new RegExp(timestamp, "g");
+
+        timecodeLink.dataset.videoSrc = media.src;
+
+        const regex = new RegExp(timestamp);
         tweetText.innerHTML = tweetText.innerHTML.replace(regex, timecodeLink.outerHTML);
     }
 
 }
 
-function waitForMediaReady(media: HTMLMediaElement, timestamps: string[]) {
+async function mediaReady(media: HTMLMediaElement): Promise<boolean> {
     if (media.duration) {
-        makeTimecodesClickable(media, timestamps);
-    } else {
-        media.addEventListener("loadedmetadata", () => {
-            makeTimecodesClickable(media, timestamps);
-        }, { once: true });
+        return true;
     }
+    return new Promise((resolve) => {
+        media.addEventListener("loadedmetadata", () => {
+            resolve(true);
+        }, { once: true });
+    });
 }
 
 function createTimestampLink(timestamp: string): HTMLAnchorElement {
