@@ -8,6 +8,18 @@ Adds support for inline code wrapping. This option will replace portions of Twee
 
 Adds support for downloading voice tweets. Click the … at the top-right of a voice Tweet, and select "Download Voice Tweet" from the menu.
 
+### Version 3.2
+
+Adds support for dynamic timecodes in Tweets with media.
+
+#### Version 3.2.1
+
+Fixed styling issue with dynamic timecode links.
+
+### Version 3.2.2
+
+Adds support for dynamic timecodes posted as an immediate reply to a Tweet with media.
+
 ## Version 2.0
 
 Adds support for ultra-wide Twitter. This option removes the sidebar column, which typically contains the *What's Happening* and *Who to Follow* sections. The resulting space is filled by the primary column, creating a considerably wider timeline.
