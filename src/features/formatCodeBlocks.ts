@@ -1,12 +1,50 @@
-import { Feature } from "../types";
+export const name = "Format Code Blocks";
+export const identifier = "formatCodeBlocks";
+export const description = "Formats inline code blocks.";
 
-const name = "Format Code Blocks";
-const identifier = "formatCodeBlocks";
-const description = "Formats inline code blocks.";
+export let enabled = false;
 
-let enabled = false;
 const codeBlockRegEx = /(?<!`)(`[^`]*`)(?!`)/g;
-let mutationObserver: MutationObserver | null = null;
+
+export const enable = () => {
+  if (enabled) {
+    return;
+  }
+
+  enabled = true;
+};
+
+export const disable = () => {
+  if (!enabled) {
+    return;
+  }
+
+  enabled = false;
+  revertCodeBlocks();
+};
+
+export const onAddedNodes = (nodes: NodeList) => {
+  if (!enabled) {
+    return;
+  }
+  for (const node of nodes) {
+    if (node instanceof HTMLElement) {
+      const tweetText = node.querySelector("[data-testid='tweetText']");
+      if (tweetText instanceof HTMLElement) {
+        processInlineCode(tweetText);
+      }
+    }
+  }
+}
+
+const revertCodeBlocks = () => {
+  // Revert all code blocks to their original state
+  for (const code of document.querySelectorAll("[data-testid='tweetText'] code")) {
+    const text = code.textContent as string;
+    const content = document.createTextNode(`\`${text}\``);
+    code.parentNode?.replaceChild(content, code);
+  }
+};
 
 const processInlineCode = (box: HTMLElement) => {
   // Create a text walker to access every text node
@@ -44,68 +82,3 @@ const processInlineCode = (box: HTMLElement) => {
     }
   }
 };
-
-const enable = () => {
-  if (enabled) {
-    return;
-  }
-
-  enabled = true;
-
-  const selector = "[data-testid='tweetText']";
-
-  // Process all existing code blocks
-  for (const tweetText of document.querySelectorAll(selector)) {
-    if (tweetText instanceof HTMLElement) {
-      processInlineCode(tweetText);
-    }
-  }
-
-  // Listen for, and process, new code blocks
-  const observer = new MutationObserver((mutations) => {
-    for (const mutation of mutations) {
-      for (const node of mutation.addedNodes) {
-        if (node instanceof HTMLElement) {
-          const tweetText = node.querySelector(selector);
-          if (tweetText instanceof HTMLElement) {
-            processInlineCode(tweetText);
-          }
-        }
-      }
-    }
-  });
-
-  mutationObserver = observer;
-  observer.observe(document.body, { childList: true, subtree: true });
-};
-
-const disable = () => {
-  if (!enabled) {
-    return;
-  }
-
-  // Disable feature and disconnect the observer
-  enabled = false;
-  mutationObserver?.disconnect();
-  mutationObserver = null;
-
-  // Revert all code blocks to their original state
-  for (const code of document.querySelectorAll("code")) {
-    const text = code.textContent as string;
-    const content = document.createTextNode(`\`${text}\``);
-    code.parentNode?.replaceChild(content, code);
-  }
-};
-
-const feature: Feature = {
-  name,
-  identifier,
-  description,
-  enable,
-  disable,
-  get enabled() {
-    return enabled;
-  },
-};
-
-export default feature;

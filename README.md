@@ -20,6 +20,12 @@ Fixed styling issue with dynamic timecode links.
 
 Adds support for dynamic timecodes posted as an immediate reply to a Tweet with media.
 
+### Version 3.2.3
+
+Moved to a single mutation observer pattern. Previously each of the features may have created their own mutation observer. This was unnecessary, since they were only interested in examining added nodes. The extension now creates a single mutation observer, and notifies each of the interested features when new nodes have been added to the DOM. This results in leaner, more optimized code.
+
+This update also fixed an issue where Voice ~~Tweets~~ _Posts_ (e.g., <https://twitter.com/ehikian/status/1659670588598923265>) were no longer downloadable from their respective menu dropdown.
+
 ## Version 2.0
 
 Adds support for ultra-wide Twitter. This option removes the sidebar column, which typically contains the *What's Happening* and *Who to Follow* sections. The resulting space is filled by the primary column, creating a considerably wider timeline.

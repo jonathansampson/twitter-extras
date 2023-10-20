@@ -1,12 +1,10 @@
-import { Feature } from "../types";
+export const name = "Hide What's Happening";
+export const identifier = "hideWhatsHappening";
+export const description = "Hides the What's Happening section on the sidebar.";
 
-const name = "Hide What's Happening";
-const identifier = "hideWhatsHappening";
-const description = "Hides the What's Happening section on the sidebar.";
+export let enabled = false;
 
-let enabled = false;
-
-const enable = () => {
+export const enable = () => {
   if (enabled) {
     return;
   }
@@ -25,7 +23,7 @@ const enable = () => {
   document.head.appendChild(element);
 };
 
-const disable = () => {
+export const disable = () => {
   if (!enabled) {
     return;
   }
@@ -34,16 +32,3 @@ const disable = () => {
 
   document.getElementById(`feature-${identifier}`)?.remove();
 };
-
-const feature: Feature = {
-  name,
-  identifier,
-  description,
-  enable,
-  disable,
-  get enabled() {
-    return enabled;
-  },
-};
-
-export default feature;

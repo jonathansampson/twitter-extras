@@ -5,6 +5,7 @@ export interface Feature {
   enabled: boolean;
   enable: () => void;
   disable: () => void;
+  onAddedNodes?: (nodes: NodeList) => void;
 }
 
 export interface StorageChanges {

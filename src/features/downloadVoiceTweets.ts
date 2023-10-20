@@ -1,16 +1,52 @@
-import { Feature } from "../types";
 import * as utils from "../utils";
 
-const name = "Download Voice Tweets";
-const identifier = "downloadVoiceTweets";
-const description = "Adds a download button on voice tweet menus.";
+export const name = "Download Voice Tweets";
+export const identifier = "downloadVoiceTweets";
+export const description = "Adds a download button on voice tweet menus.";
 
-let enabled = false;
+const menuItemSelector = "div[role='menuitem']";
+const voicePostElementSelector = "[aria-label='Voice post']";
+const menuElementSelector = "#layers [data-testid='Dropdown']";
+const downloadVoicePostLabel = "Download Voice Post";
+
+export let enabled = false;
 let ourButton: HTMLElement | null = null;
-let mutationObserver: MutationObserver | null = null;
+
+export const enable = () => {
+    if (enabled) {
+        return;
+    }
+
+    enabled = true;
+};
+
+export const disable = () => {
+    if (!enabled) {
+        return;
+    }
+
+    enabled = false;
+    ourButton = null;
+};
+
+export const onAddedNodes = (nodes: NodeList) => {
+    if (!enabled) {
+        return;
+    }
+    for (const node of nodes) {
+        if (node instanceof HTMLElement) {
+            const menu = node.querySelector(menuElementSelector);
+            if (menu instanceof HTMLElement) {
+                if (isVoiceTweetEngaged()) {
+                    createMenuButton(menu, saveVoiceInfo);
+                }
+            }
+        }
+    }
+}
 
 const createMenuButton = (dropdown: HTMLElement, onClick: () => void) => {
-    const divMenuItem = dropdown.querySelector("div[role='menuitem']");
+    const divMenuItem = dropdown.querySelector(menuItemSelector);
     const newMenuItem = divMenuItem!.cloneNode(true) as HTMLElement;
 
     newMenuItem.querySelector("svg > g > path")?.setAttribute(
@@ -22,7 +58,7 @@ const createMenuButton = (dropdown: HTMLElement, onClick: () => void) => {
         .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z`
     );
 
-    newMenuItem.querySelector("div > span")!.textContent = "Download Voice Tweet";
+    newMenuItem.querySelector("div > span")!.textContent = downloadVoicePostLabel;
     newMenuItem.addEventListener("click", onClick);
 
     ourButton = newMenuItem;
@@ -32,7 +68,7 @@ const createMenuButton = (dropdown: HTMLElement, onClick: () => void) => {
 
 const isVoiceTweetEngaged = () => {
     const element = utils.getTweetElementForActiveMenu();
-    const voiceTweet = element?.querySelector("[aria-label='Voice Tweet']");
+    const voiceTweet = element?.querySelector(voicePostElementSelector);
     if (voiceTweet) {
         return true;
     }
@@ -43,7 +79,7 @@ async function saveVoiceInfo() {
 
     const { properties } = await utils.mainWorldRequest({
         type: "getVoiceInfo",
-        data: { tweetID: utils.getTweetIDForActiveMenu() },
+        data: { tweetID: await utils.getTweetIDForActiveMenu() },
     });
 
     if (properties) {
@@ -65,60 +101,3 @@ async function saveVoiceInfo() {
     utils.sendEscapeKey(ourButton!);
 
 };
-
-const enable = () => {
-    if (enabled) {
-        return;
-    }
-
-    enabled = true;
-
-    mutationObserver = new MutationObserver((mutations) => {
-        for (const mutation of mutations) {
-            for (const node of mutation.addedNodes) {
-                if (node instanceof HTMLElement) {
-
-                    const dropdown = node.querySelector(
-                        "#layers [data-testid='Dropdown']"
-                    );
-
-                    if (dropdown instanceof HTMLElement) {
-                        if (isVoiceTweetEngaged()) {
-                            createMenuButton(dropdown, saveVoiceInfo);
-                        }
-                    }
-
-                }
-            }
-        }
-    });
-
-    mutationObserver.observe(document.body, {
-        childList: true,
-        subtree: true,
-    });
-};
-
-const disable = () => {
-    if (!enabled) {
-        return;
-    }
-
-    enabled = false;
-    mutationObserver?.disconnect();
-    mutationObserver = null;
-    ourButton = null;
-};
-
-const feature: Feature = {
-    name,
-    identifier,
-    description,
-    enable,
-    disable,
-    get enabled() {
-        return enabled;
-    },
-};
-
-export default feature;

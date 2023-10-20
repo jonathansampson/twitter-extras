@@ -1,11 +1,9 @@
-import { Feature } from "../types";
+export const name = "Clickable Timecodes";
+export const identifier = "timecodes";
+export const description = "Enables clickable timecodes in Tweets with a video.";
 
-const name = "Clickable Timecodes";
-const identifier = "timecodes";
-const description = "Enables clickable timecodes in Tweets with a video.";
+export let enabled = false;
 
-let enabled = false;
-let mutationObserver: MutationObserver | null = null;
 const timecodeLinkSelector = "a[data-timecode]";
 const tweetTextSelector = "[data-testid='tweetText']";
 const mediaSelector = `[data-testid='tweet'] [data-testid='videoComponent'] video`;
@@ -17,7 +15,7 @@ const mediaSelector = `[data-testid='tweet'] [data-testid='videoComponent'] vide
  * - https://twitter.com/TuckerCarlson/status/1714827415241867538
  */
 
-const enable = () => {
+export const enable = () => {
     if (enabled) {
         return;
     }
@@ -26,49 +24,48 @@ const enable = () => {
 
     // Process all existing media elements
     processMediaElements();
-
-    // Listen for, and process, new media elements
-    const observer = new MutationObserver((mutations) => {
-        for (const mutation of mutations) {
-            for (const node of mutation.addedNodes) {
-                if (node instanceof HTMLElement) {
-                    processMediaElements(node);
-                }
-            }
-        }
-    });
-
-    mutationObserver = observer;
-    observer.observe(document.body, { childList: true, subtree: true });
-
     addTimecodeStyles();
 
     // Delegate click events on timecode links
-    document.body.addEventListener("click", (event) => {
-        const target = event.target as HTMLAnchorElement;
-        if (target.matches(timecodeLinkSelector)) {
-            const media = document.querySelector(`[src='${target.dataset.videoSrc}']`);
-            if (media instanceof HTMLMediaElement) {
-                event.preventDefault();
-                handleTimestampClick(target, media);
-            }
-        }
-    });
+    document.body.addEventListener("click", handleClicks);
 
 };
 
-const disable = () => {
+export function onAddedNodes(nodes: NodeList) {
+    if (!enabled) {
+        return;
+    }
+    for (const node of nodes) {
+        if (node instanceof HTMLElement) {
+            processMediaElements(node);
+        }
+    }
+}
+
+export const disable = () => {
     if (!enabled) {
         return;
     }
 
     enabled = false;
-    mutationObserver?.disconnect();
-    mutationObserver = null;
+
+    // Stop listening for click events
+    document.body.removeEventListener("click", handleClicks);
 
     removeTimecodeStyles();
     revertTimecodeLinks();
 
+};
+
+const handleClicks = (event: MouseEvent) => {
+    const target = event.target as HTMLAnchorElement;
+    if (target.matches(timecodeLinkSelector)) {
+        const media = document.querySelector(`[src='${target.dataset.videoSrc}']`);
+        if (media instanceof HTMLMediaElement) {
+            event.preventDefault();
+            handleTimestampClick(target, media);
+        }
+    }
 };
 
 const addTimecodeStyles = () => {
@@ -216,16 +213,3 @@ function revertTimecodeLinks() {
         }
     }
 }
-
-const feature: Feature = {
-    name,
-    identifier,
-    description,
-    enable,
-    disable,
-    get enabled() {
-        return enabled;
-    },
-};
-
-export default feature;
