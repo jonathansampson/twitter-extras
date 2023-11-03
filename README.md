@@ -26,6 +26,10 @@ Moved to a single mutation observer pattern. Previously each of the features may
 
 This update also fixed an issue where Voice ~~Tweets~~ _Posts_ (e.g., <https://twitter.com/ehikian/status/1659670588598923265>) were no longer downloadable from their respective menu dropdown.
 
+### Version 3.2.4
+
+Adds support for draggable post box. This enables the author to move their _New Post_ box around while authoring a new post. This could be helpful if you're attempting to read a post to which you are replying, but find that it is partially obstructed by the post box itself.
+
 ## Version 2.0
 
 Adds support for ultra-wide Twitter. This option removes the sidebar column, which typically contains the *What's Happening* and *Who to Follow* sections. The resulting space is filled by the primary column, creating a considerably wider timeline.

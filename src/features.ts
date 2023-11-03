@@ -5,6 +5,7 @@ import * as hideWhatsHappening from "./features/hideWhatsHappening";
 import * as hideWhoToFollow from "./features/hideWhoToFollow";
 import * as formatCodeBlocks from "./features/formatCodeBlocks";
 import * as timecodes from "./features/timecodes";
+import * as draggablePostBox from "./features/draggablePostBox";
 
 const defaultFeatures = [
   /* Downloadable Videos */, /* https://twitter.com/HumansNoContext/status/1660339245607780359 */
@@ -12,6 +13,7 @@ const defaultFeatures = [
 ];
 
 const optionalFeatures = {
+  draggablePostBox,
   hideWhatsHappening,
   hideWhoToFollow,
   formatCodeBlocks,     /* https://twitter.com/jonathansampson/status/1659603602636259333 */
