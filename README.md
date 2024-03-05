@@ -16,19 +16,23 @@ Adds support for dynamic timecodes in Tweets with media.
 
 Fixed styling issue with dynamic timecode links.
 
-### Version 3.2.2
+#### Version 3.2.2
 
 Adds support for dynamic timecodes posted as an immediate reply to a Tweet with media.
 
-### Version 3.2.3
+#### Version 3.2.3
 
 Moved to a single mutation observer pattern. Previously each of the features may have created their own mutation observer. This was unnecessary, since they were only interested in examining added nodes. The extension now creates a single mutation observer, and notifies each of the interested features when new nodes have been added to the DOM. This results in leaner, more optimized code.
 
 This update also fixed an issue where Voice ~~Tweets~~ _Posts_ (e.g., <https://twitter.com/ehikian/status/1659670588598923265>) were no longer downloadable from their respective menu dropdown.
 
-### Version 3.2.4
+#### Version 3.2.4
 
 Adds support for draggable post box. This enables the author to move their _New Post_ box around while authoring a new post. This could be helpful if you're attempting to read a post to which you are replying, but find that it is partially obstructed by the post box itself.
+
+### Version 3.3
+
+Removes *Dynamic Timecode* support (introduced in updates 3.2, 3.2.1, and 3.2.2) as this feature is now natively supported on X/Twitter.
 
 ## Version 2.0
 

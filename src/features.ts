@@ -4,7 +4,6 @@ import * as downloadVoiceTweets from "./features/downloadVoiceTweets";
 import * as hideWhatsHappening from "./features/hideWhatsHappening";
 import * as hideWhoToFollow from "./features/hideWhoToFollow";
 import * as formatCodeBlocks from "./features/formatCodeBlocks";
-import * as timecodes from "./features/timecodes";
 import * as draggablePostBox from "./features/draggablePostBox";
 
 const defaultFeatures = [
@@ -18,7 +17,6 @@ const optionalFeatures = {
   hideWhoToFollow,
   formatCodeBlocks,     /* https://twitter.com/jonathansampson/status/1659603602636259333 */
   downloadVoiceTweets,  /* https://twitter.com/ehikian/status/1659670588598923265 */
-  timecodes,            /* https://twitter.com/lexfridman/status/1712170815637061914 */
 } as Record<string, Feature>;
 
 /**
@@ -58,6 +56,17 @@ observer.observe(document.body, {
  * allow for both `StorageRecords` and `StorageChanges`.
  */
 function setFeatures(items: StorageRecords | StorageChanges) {
+  /**
+   * Start by deprecating any records which are no
+   * longer supported as features. We'll check their
+   * key, and if it isn't a feature, we'll remove it.
+   */
+  for (const key in items) {
+    if (!optionalFeatures.hasOwnProperty(key)) {
+      chrome.storage.local.remove(key);
+    }
+  }
+
   /**
    * Cycle over all features, and enable/disable them
    * based on the value in `items`, if any.
