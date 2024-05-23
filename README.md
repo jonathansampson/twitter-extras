@@ -24,7 +24,7 @@ Adds support for dynamic timecodes posted as an immediate reply to a Tweet with 
 
 Moved to a single mutation observer pattern. Previously each of the features may have created their own mutation observer. This was unnecessary, since they were only interested in examining added nodes. The extension now creates a single mutation observer, and notifies each of the interested features when new nodes have been added to the DOM. This results in leaner, more optimized code.
 
-This update also fixed an issue where Voice ~~Tweets~~ _Posts_ (e.g., <https://twitter.com/ehikian/status/1659670588598923265>) were no longer downloadable from their respective menu dropdown.
+This update also fixed an issue where Voice ~~Tweets~~ _Posts_ (e.g., <https://x.com/ehikian/status/1659670588598923265>) were no longer downloadable from their respective menu dropdown.
 
 #### Version 3.2.4
 
@@ -33,6 +33,10 @@ Adds support for draggable post box. This enables the author to move their _New 
 ### Version 3.3
 
 Removes *Dynamic Timecode* support (introduced in updates 3.2, 3.2.1, and 3.2.2) as this feature is now natively supported on X/Twitter.
+
+### Version 3.4
+
+Removed all instances of twitter.com, and replaced with x.com.
 
 ## Version 2.0
 

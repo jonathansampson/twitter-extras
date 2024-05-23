@@ -4,18 +4,18 @@ chrome.runtime.onInstalled.addListener(() => {
         {
             id: "mediator",
             js: ["mediator.js"],
-            matches: ["https://twitter.com/*"],
+            matches: ["https://x.com/*"],
         },
         {
             id: "mainWorld",
             world: "MAIN",
             js: ["content.js"],
-            matches: ["https://twitter.com/*"],
+            matches: ["https://x.com/*"],
         },
         {
             id: "features",
             js: ["features.js"],
-            matches: ["https://twitter.com/*"],
+            matches: ["https://x.com/*"],
         }
     ] as chrome.scripting.RegisteredContentScript[];
 

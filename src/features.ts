@@ -7,16 +7,16 @@ import * as formatCodeBlocks from "./features/formatCodeBlocks";
 import * as draggablePostBox from "./features/draggablePostBox";
 
 const defaultFeatures = [
-  /* Downloadable Videos */, /* https://twitter.com/HumansNoContext/status/1660339245607780359 */
-  /* Picture-in-Picture */, /* https://twitter.com/HumansNoContext/status/1660339245607780359 */
+  /* Downloadable Videos */, /* https://x.com/HumansNoContext/status/1660339245607780359 */
+  /* Picture-in-Picture */, /* https://x.com/HumansNoContext/status/1660339245607780359 */
 ];
 
 const optionalFeatures = {
   draggablePostBox,
   hideWhatsHappening,
   hideWhoToFollow,
-  formatCodeBlocks,     /* https://twitter.com/jonathansampson/status/1659603602636259333 */
-  downloadVoiceTweets,  /* https://twitter.com/ehikian/status/1659670588598923265 */
+  formatCodeBlocks,     /* https://x.com/jonathansampson/status/1659603602636259333 */
+  downloadVoiceTweets,  /* https://x.com/ehikian/status/1659670588598923265 */
 } as Record<string, Feature>;
 
 /**
